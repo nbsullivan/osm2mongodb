@@ -1,0 +1,5 @@
+{'lower': 1763346,
+ 'lower_colon': 1488116,
+ 'other': 163770,
+ 'problemchars': 2,
+ 'probs': ['food cart', 'food cart']}
