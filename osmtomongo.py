@@ -49,7 +49,10 @@ class MongoLoader(object):
 	class for loading data from osm files to json for going into a mongodb instance
 	'''
 
-	def shape_element(element):
+	def __init__(self):
+		pass
+		
+	def shape_element(self, element):
  	   node = {}
     	if element.tag == "node" or element.tag == "way" :
         	node = element.attrib
@@ -107,13 +110,13 @@ class MongoLoader(object):
     	    return None
 
 	#for replacing street names
-	def replace_last(source, old, new):
+	def replace_last(self, source, old, new):
 	    head, sep, tail = source.rpartition(old)
 	    return head + new
 
 
 
-	def process_map(file_in, pretty = False):
+	def process_map(self, file_in, pretty = False):
 	    file_out = "{0}.json".format(file_in)
 	    data = []
 	    #write out the convereted osm to a json, probably should not be storing the whole thing in the data varible, this is probably why I am leaking so much memory
@@ -131,7 +134,7 @@ class MongoLoader(object):
 	    return data
 
 
-	def get_element(osm_file, tags=('node', 'way', 'relation')):
+	def get_element(self, osm_file, tags=('node', 'way', 'relation')):
 	    """Yield element if it is the right type of tag
 
 	    Reference:
@@ -157,7 +160,7 @@ class MongoLoader(object):
 
     	output.write('</osm>')
     ''''
-    def audit_street_type(street_types, street_name):
+    def audit_street_type(self, street_types, street_name):
 	    m = street_type_re.search(street_name)
 	    if m:
 	        street_type = m.group()
@@ -165,10 +168,10 @@ class MongoLoader(object):
 	            street_types[street_type].add(street_name)
 
 	#this probably doesn't need its own function
-	def is_street_name(elem):
+	def is_street_name(self, elem):
 	    return (elem.attrib['k'] == "addr:street")
 
-	def audit(osmfile):
+	def audit(self, osmfile):
 	    osm_file = open(osmfile, "r")
 	    street_types = defaultdict(set)
 	    users = {}
@@ -190,7 +193,7 @@ class MongoLoader(object):
 
 	    return street_types, users
 
-	def key_type(element, keys, event):
+	def key_type(self, element, keys, event):
     
 	    if element.tag == "tag":
 	        if problemchars.search(element.attrib['k']):
@@ -210,7 +213,7 @@ class MongoLoader(object):
 	    return keys
 
 
-	def problem_map(filename):
+	def problem_map(self, filename):
     	keys = {"lower": 0, "lower_colon": 0, "problemchars": 0, "other": 0, 'probs' : []}
     	for event, element in ET.iterparse(filename, events = ("start","end")):
     	    keys = key_type(element, keys, event)
@@ -218,4 +221,3 @@ class MongoLoader(object):
     	return keys
 
 
-   	
