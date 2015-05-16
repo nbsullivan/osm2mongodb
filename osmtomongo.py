@@ -45,6 +45,10 @@ mapping = { "St": "Street",
 
 
 class MongoLoader(object):
+	'''
+	class for loading data from osm files to json for going into a mongodb instance
+	'''
+
 	def shape_element(element):
  	   node = {}
     	if element.tag == "node" or element.tag == "way" :
@@ -153,3 +157,65 @@ class MongoLoader(object):
 
     	output.write('</osm>')
     ''''
+    def audit_street_type(street_types, street_name):
+	    m = street_type_re.search(street_name)
+	    if m:
+	        street_type = m.group()
+	        if street_type not in expected:
+	            street_types[street_type].add(street_name)
+
+	#this probably doesn't need its own function
+	def is_street_name(elem):
+	    return (elem.attrib['k'] == "addr:street")
+
+	def audit(osmfile):
+	    osm_file = open(osmfile, "r")
+	    street_types = defaultdict(set)
+	    users = {}
+
+	    #loop over elems in osm_file find the uids and check the streets against expected. 
+	    for event, elem in ET.iterparse(osm_file, events=("start","end")):        
+	        if event == 'end':
+	            elem.clear()
+	            #without clearing the elems memory leaks very quickly
+	        if elem.attrib.has_key("uid"):
+	            if users.has_key(elem.attrib['uid']):
+	                users[elem.attrib['uid']] += 1
+	            else:
+	                users[elem.attrib['uid']] = 1
+	        if elem.tag == "node" or elem.tag == "way":
+	            for tag in elem.iter("tag"):
+	                if is_street_name(tag):
+	                    audit_street_type(street_types, tag.attrib['v'])
+
+	    return street_types, users
+
+	def key_type(element, keys, event):
+    
+	    if element.tag == "tag":
+	        if problemchars.search(element.attrib['k']):
+	            keys["problemchars"] += 1
+	            keys['probs'].append(element.attrib['k'])            
+	        elif lower_colon.search(element.attrib['k']):
+	            keys["lower_colon"] += 1
+	        elif lower.search(element.attrib['k']):
+	            keys["lower"] += 1
+	        else:
+	            keys["other"] += 1
+	    if event == 'end':
+	        element.clear()
+        
+	        pass
+        
+	    return keys
+
+
+	def problem_map(filename):
+    	keys = {"lower": 0, "lower_colon": 0, "problemchars": 0, "other": 0, 'probs' : []}
+    	for event, element in ET.iterparse(filename, events = ("start","end")):
+    	    keys = key_type(element, keys, event)
+
+    	return keys
+
+
+   	

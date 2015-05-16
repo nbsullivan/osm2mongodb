@@ -40,7 +40,7 @@ def key_type(element, keys, event):
 
 
 
-def process_map(filename):
+def problem_map(filename):
     keys = {"lower": 0, "lower_colon": 0, "problemchars": 0, "other": 0, 'probs' : []}
     for event, element in ET.iterparse(filename, events = ("start","end")):
         keys = key_type(element, keys, event)
@@ -50,9 +50,7 @@ def process_map(filename):
 
 
 def test():
-    # You can use another testfile 'map.osm' to look at your solution
-    # Note that the assertions will be incorrect then.
-    keys = process_map('portland_oregon.osm')
+    keys = problem_map('portland_oregon.osm')
     pprint.pprint(keys)
 
 
