@@ -1,0 +1,4 @@
+Sources:
+
+http://stackoverflow.com/questions/7697710/python-running-out-of-memory-parsing-xml-using-celementtree-iterparse
+http://www.ibm.com/developerworks/xml/library/x-hiperfparse/
