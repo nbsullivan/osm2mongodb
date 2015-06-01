@@ -23,9 +23,9 @@ with open(SAMPLE_FILE, 'wb') as output:
     output.write('<?xml version="1.0" encoding="UTF-8"?>\n')
     output.write('<osm>\n  ')
 
-    # Write every 10th top level element
+    # Write every 100th top level element
     for i, element in enumerate(get_element(OSM_FILE)):
-        if i % 10 == 0:
+        if i % 100 == 0:
             output.write(ET.tostring(element, encoding='utf-8'))
 
     output.write('</osm>')
